@@ -29,9 +29,11 @@
 //! - [`GcsConfig`]: Google Cloud Storage specific configuration
 //! - [`OssConfig`]: Alibaba Cloud OSS specific configuration
 //! - [`AzdlsConfig`]: Azure Data Lake Storage specific configuration
+//! - [`HuggingfaceStorageConfig`]: HuggingFace Hub specific configuration
 
 mod azdls;
 mod gcs;
+mod hf;
 mod oss;
 mod s3;
 
@@ -39,6 +41,7 @@ use std::collections::HashMap;
 
 pub use azdls::*;
 pub use gcs::*;
+pub use hf::*;
 pub use oss::*;
 pub use s3::*;
 use serde::{Deserialize, Serialize};

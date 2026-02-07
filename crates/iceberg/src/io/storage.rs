@@ -59,12 +59,12 @@ pub use crate::io::config::StorageConfig;
 ///     }
 ///     // ... implement other methods
 /// }
-///
-/// TODO remove below when the trait is integrated with FileIO and Catalog
-/// # NOTE
-/// This trait is under heavy development and is not used anywhere as of now
-/// Please DO NOT implement it
 /// ```
+///
+/// TODO: remove below when the trait is integrated with FileIO and Catalog
+///
+/// **NOTE:** This trait is under heavy development and is not used anywhere as of now.
+/// Please DO NOT implement it.
 #[async_trait]
 #[typetag::serde(tag = "type")]
 pub trait Storage: Debug + Send + Sync {
@@ -120,12 +120,12 @@ pub trait Storage: Debug + Send + Sync {
 ///         todo!()
 ///     }
 /// }
-///
-/// TODO remove below when the trait is integrated with FileIO and Catalog
-/// # NOTE
-/// This trait is under heavy development and is not used anywhere as of now
-/// Please DO NOT implement it
 /// ```
+///
+/// TODO: remove below when the trait is integrated with FileIO and Catalog
+///
+/// **NOTE:** This trait is under heavy development and is not used anywhere as of now.
+/// Please DO NOT implement it.
 #[typetag::serde(tag = "type")]
 pub trait StorageFactory: Debug + Send + Sync {
     /// Build a new Storage instance from the given configuration.

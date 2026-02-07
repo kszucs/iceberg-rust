@@ -29,6 +29,8 @@ use opendal::layers::RetryLayer;
 use opendal::services::AzdlsConfig;
 #[cfg(feature = "storage-gcs")]
 use opendal::services::GcsConfig;
+#[cfg(feature = "storage-huggingface")]
+use opendal::services::HuggingfaceConfig;
 #[cfg(feature = "storage-oss")]
 use opendal::services::OssConfig;
 #[cfg(feature = "storage-s3")]
@@ -50,6 +52,8 @@ mod azdls;
 mod fs;
 #[cfg(feature = "storage-gcs")]
 mod gcs;
+#[cfg(feature = "storage-huggingface")]
+mod hf;
 #[cfg(feature = "storage-memory")]
 mod memory;
 #[cfg(feature = "storage-oss")]
@@ -63,6 +67,8 @@ use azdls::*;
 use fs::*;
 #[cfg(feature = "storage-gcs")]
 use gcs::*;
+#[cfg(feature = "storage-huggingface")]
+use hf::*;
 #[cfg(feature = "storage-memory")]
 use memory::*;
 #[cfg(feature = "storage-oss")]
@@ -96,6 +102,9 @@ pub enum OpenDalStorageFactory {
     /// OSS storage factory.
     #[cfg(feature = "storage-oss")]
     Oss,
+    /// HuggingFace Hub storage factory.
+    #[cfg(feature = "storage-huggingface")]
+    Huggingface,
     /// Azure Data Lake Storage factory.
     #[cfg(feature = "storage-azdls")]
     Azdls {
@@ -131,6 +140,10 @@ impl StorageFactory for OpenDalStorageFactory {
             OpenDalStorageFactory::Oss => Ok(Arc::new(OpenDalStorage::Oss {
                 config: oss_config_parse(config.props().clone())?.into(),
             })),
+            #[cfg(feature = "storage-huggingface")]
+            OpenDalStorageFactory::Huggingface => Ok(Arc::new(OpenDalStorage::Huggingface {
+                config: hf_config_parse(config.props().clone())?.into(),
+            })),
             #[cfg(feature = "storage-azdls")]
             OpenDalStorageFactory::Azdls { configured_scheme } => {
                 Ok(Arc::new(OpenDalStorage::Azdls {
@@ -144,6 +157,7 @@ impl StorageFactory for OpenDalStorageFactory {
                 not(feature = "storage-s3"),
                 not(feature = "storage-gcs"),
                 not(feature = "storage-oss"),
+                not(feature = "storage-huggingface"),
                 not(feature = "storage-azdls"),
             ))]
             _ => Err(Error::new(
@@ -193,6 +207,13 @@ pub enum OpenDalStorage {
         /// OSS configuration.
         config: Arc<OssConfig>,
     },
+    /// HuggingFace Hub storage variant.
+    /// Expects paths of the form `hf://<owner>/<repo>/<path>`.
+    #[cfg(feature = "storage-huggingface")]
+    Huggingface {
+        /// HuggingFace configuration.
+        config: Arc<HuggingfaceConfig>,
+    },
     /// Azure Data Lake Storage variant.
     /// Expects paths of the form
     /// `abfs[s]://<filesystem>@<account>.dfs.<endpoint-suffix>/<path>` or
@@ -238,6 +259,10 @@ impl OpenDalStorage {
             #[cfg(feature = "storage-oss")]
             Scheme::Oss => Ok(Self::Oss {
                 config: oss_config_parse(props)?.into(),
+            }),
+            #[cfg(feature = "storage-huggingface")]
+            Scheme::Huggingface => Ok(Self::Huggingface {
+                config: hf_config_parse(props)?.into(),
             }),
             #[cfg(feature = "storage-azdls")]
             Scheme::Azdls => {
@@ -337,6 +362,10 @@ impl OpenDalStorage {
                     ));
                 }
             }
+            #[cfg(feature = "storage-huggingface")]
+            OpenDalStorage::Huggingface { config } => {
+                hf_config_build(config, path)?
+            }
             #[cfg(feature = "storage-azdls")]
             OpenDalStorage::Azdls {
                 configured_scheme,
@@ -346,6 +375,7 @@ impl OpenDalStorage {
                 not(feature = "storage-s3"),
                 not(feature = "storage-fs"),
                 not(feature = "storage-gcs"),
+                not(feature = "storage-huggingface"),
                 not(feature = "storage-oss"),
                 not(feature = "storage-azdls"),
             ))]
@@ -371,6 +401,7 @@ impl OpenDalStorage {
             "s3" | "s3a" => Ok(Scheme::S3),
             "gs" | "gcs" => Ok(Scheme::Gcs),
             "oss" => Ok(Scheme::Oss),
+            "hf" => Ok(Scheme::Huggingface),
             "abfss" | "abfs" | "wasbs" | "wasb" => Ok(Scheme::Azdls),
             s => Ok(s.parse::<Scheme>()?),
         }
