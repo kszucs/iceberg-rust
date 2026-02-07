@@ -37,9 +37,9 @@ pub const HF_ENDPOINT: &str = "hf.endpoint";
 /// HuggingFace Hub storage configuration.
 ///
 /// This struct contains all the configuration options for accessing HuggingFace Hub storage.
-/// Use the builder pattern via `HfStorageConfig::builder()` to construct instances.
+/// Use the builder pattern via `HfConfig::builder()` to construct instances.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
-pub struct HfStorageConfig {
+pub struct HfConfig {
     /// Repository type (`dataset`, `model`, `space`). Defaults to `dataset`.
     #[builder(default, setter(strip_option, into))]
     pub repo_type: Option<String>,
@@ -54,13 +54,13 @@ pub struct HfStorageConfig {
     pub endpoint: Option<String>,
 }
 
-impl TryFrom<&StorageConfig> for HfStorageConfig {
+impl TryFrom<&StorageConfig> for HfConfig {
     type Error = crate::Error;
 
     fn try_from(config: &StorageConfig) -> Result<Self> {
         let props = config.props();
 
-        let mut cfg = HfStorageConfig::default();
+        let mut cfg = HfConfig::default();
         if let Some(repo_type) = props.get(HF_REPO_TYPE) {
             cfg.repo_type = Some(repo_type.clone());
         }
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn test_hf_config_builder() {
-        let config = HfStorageConfig::builder()
+        let config = HfConfig::builder()
             .repo_type("dataset")
             .revision("main")
             .token("hf_xxx")
@@ -104,7 +104,7 @@ mod tests {
             .with_prop(HF_REVISION, "v1.0")
             .with_prop(HF_TOKEN, "hf_xxx");
 
-        let hf_config = HfStorageConfig::try_from(&storage_config).unwrap();
+        let hf_config = HfConfig::try_from(&storage_config).unwrap();
 
         assert_eq!(hf_config.repo_type.as_deref(), Some("model"));
         assert_eq!(hf_config.revision.as_deref(), Some("v1.0"));
@@ -116,7 +116,7 @@ mod tests {
     fn test_hf_config_empty() {
         let storage_config = StorageConfig::new();
 
-        let hf_config = HfStorageConfig::try_from(&storage_config).unwrap();
+        let hf_config = HfConfig::try_from(&storage_config).unwrap();
 
         assert_eq!(hf_config.repo_type, None);
         assert_eq!(hf_config.revision, None);

@@ -104,7 +104,7 @@ pub enum OpenDalStorageFactory {
     Oss,
     /// HuggingFace Hub storage factory.
     #[cfg(feature = "storage-hf")]
-    Huggingface,
+    Hf,
     /// Azure Data Lake Storage factory.
     #[cfg(feature = "storage-azdls")]
     Azdls {
@@ -141,7 +141,7 @@ impl StorageFactory for OpenDalStorageFactory {
                 config: oss_config_parse(config.props().clone())?.into(),
             })),
             #[cfg(feature = "storage-hf")]
-            OpenDalStorageFactory::Huggingface => Ok(Arc::new(OpenDalStorage::Huggingface {
+            OpenDalStorageFactory::Hf => Ok(Arc::new(OpenDalStorage::Hf {
                 config: hf_config_parse(config.props().clone())?.into(),
             })),
             #[cfg(feature = "storage-azdls")]
@@ -210,7 +210,7 @@ pub enum OpenDalStorage {
     /// HuggingFace Hub storage variant.
     /// Expects paths of the form `hf://<owner>/<repo>/<path>`.
     #[cfg(feature = "storage-hf")]
-    Huggingface {
+    Hf {
         /// HuggingFace configuration.
         config: Arc<HuggingfaceConfig>,
     },
@@ -261,7 +261,7 @@ impl OpenDalStorage {
                 config: oss_config_parse(props)?.into(),
             }),
             #[cfg(feature = "storage-hf")]
-            Scheme::Huggingface => Ok(Self::Huggingface {
+            Scheme::Huggingface => Ok(Self::Hf {
                 config: hf_config_parse(props)?.into(),
             }),
             #[cfg(feature = "storage-azdls")]
@@ -363,7 +363,7 @@ impl OpenDalStorage {
                 }
             }
             #[cfg(feature = "storage-hf")]
-            OpenDalStorage::Huggingface { config } => {
+            OpenDalStorage::Hf { config } => {
                 hf_config_build(config, path)?
             }
             #[cfg(feature = "storage-azdls")]
