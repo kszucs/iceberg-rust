@@ -26,20 +26,20 @@ use super::StorageConfig;
 use crate::Result;
 
 /// HuggingFace repository type (`dataset`, `model`, `space`).
-pub const HUGGINGFACE_REPO_TYPE: &str = "huggingface.repo-type";
+pub const HF_REPO_TYPE: &str = "hf.repo-type";
 /// HuggingFace git revision/branch.
-pub const HUGGINGFACE_REVISION: &str = "huggingface.revision";
+pub const HF_REVISION: &str = "hf.revision";
 /// HuggingFace API token for private repos.
-pub const HUGGINGFACE_TOKEN: &str = "huggingface.token";
+pub const HF_TOKEN: &str = "hf.token";
 /// Custom HuggingFace Hub endpoint.
-pub const HUGGINGFACE_ENDPOINT: &str = "huggingface.endpoint";
+pub const HF_ENDPOINT: &str = "hf.endpoint";
 
 /// HuggingFace Hub storage configuration.
 ///
 /// This struct contains all the configuration options for accessing HuggingFace Hub storage.
-/// Use the builder pattern via `HuggingfaceStorageConfig::builder()` to construct instances.
+/// Use the builder pattern via `HfStorageConfig::builder()` to construct instances.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
-pub struct HuggingfaceStorageConfig {
+pub struct HfStorageConfig {
     /// Repository type (`dataset`, `model`, `space`). Defaults to `dataset`.
     #[builder(default, setter(strip_option, into))]
     pub repo_type: Option<String>,
@@ -54,23 +54,23 @@ pub struct HuggingfaceStorageConfig {
     pub endpoint: Option<String>,
 }
 
-impl TryFrom<&StorageConfig> for HuggingfaceStorageConfig {
+impl TryFrom<&StorageConfig> for HfStorageConfig {
     type Error = crate::Error;
 
     fn try_from(config: &StorageConfig) -> Result<Self> {
         let props = config.props();
 
-        let mut cfg = HuggingfaceStorageConfig::default();
-        if let Some(repo_type) = props.get(HUGGINGFACE_REPO_TYPE) {
+        let mut cfg = HfStorageConfig::default();
+        if let Some(repo_type) = props.get(HF_REPO_TYPE) {
             cfg.repo_type = Some(repo_type.clone());
         }
-        if let Some(revision) = props.get(HUGGINGFACE_REVISION) {
+        if let Some(revision) = props.get(HF_REVISION) {
             cfg.revision = Some(revision.clone());
         }
-        if let Some(token) = props.get(HUGGINGFACE_TOKEN) {
+        if let Some(token) = props.get(HF_TOKEN) {
             cfg.token = Some(token.clone());
         }
-        if let Some(endpoint) = props.get(HUGGINGFACE_ENDPOINT) {
+        if let Some(endpoint) = props.get(HF_ENDPOINT) {
             cfg.endpoint = Some(endpoint.clone());
         }
 
@@ -83,8 +83,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_huggingface_config_builder() {
-        let config = HuggingfaceStorageConfig::builder()
+    fn test_hf_config_builder() {
+        let config = HfStorageConfig::builder()
             .repo_type("dataset")
             .revision("main")
             .token("hf_xxx")
@@ -98,13 +98,13 @@ mod tests {
     }
 
     #[test]
-    fn test_huggingface_config_from_storage_config() {
+    fn test_hf_config_from_storage_config() {
         let storage_config = StorageConfig::new()
-            .with_prop(HUGGINGFACE_REPO_TYPE, "model")
-            .with_prop(HUGGINGFACE_REVISION, "v1.0")
-            .with_prop(HUGGINGFACE_TOKEN, "hf_xxx");
+            .with_prop(HF_REPO_TYPE, "model")
+            .with_prop(HF_REVISION, "v1.0")
+            .with_prop(HF_TOKEN, "hf_xxx");
 
-        let hf_config = HuggingfaceStorageConfig::try_from(&storage_config).unwrap();
+        let hf_config = HfStorageConfig::try_from(&storage_config).unwrap();
 
         assert_eq!(hf_config.repo_type.as_deref(), Some("model"));
         assert_eq!(hf_config.revision.as_deref(), Some("v1.0"));
@@ -113,10 +113,10 @@ mod tests {
     }
 
     #[test]
-    fn test_huggingface_config_empty() {
+    fn test_hf_config_empty() {
         let storage_config = StorageConfig::new();
 
-        let hf_config = HuggingfaceStorageConfig::try_from(&storage_config).unwrap();
+        let hf_config = HfStorageConfig::try_from(&storage_config).unwrap();
 
         assert_eq!(hf_config.repo_type, None);
         assert_eq!(hf_config.revision, None);

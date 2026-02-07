@@ -33,7 +33,7 @@ default = ["storage-memory", "storage-fs", "storage-s3"]
 storage-all = ["storage-memory", "storage-fs", "storage-s3", "storage-gcs"]
 
 storage-azdls = ["opendal/services-azdls"]
-storage-huggingface = ["opendal/services-huggingface"]
+storage-hf = ["opendal/services-huggingface"]
 storage-fs = ["opendal/services-fs"]
 storage-gcs = ["opendal/services-gcs"]
 storage-memory = ["opendal/services-memory"]

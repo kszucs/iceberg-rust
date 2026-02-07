@@ -20,7 +20,7 @@ use std::collections::HashMap;
 use opendal::Operator;
 use opendal::services::HuggingfaceConfig;
 
-use crate::io::config::{HUGGINGFACE_REPO_TYPE, HUGGINGFACE_REVISION, HUGGINGFACE_TOKEN};
+use crate::io::config::{HF_REPO_TYPE, HF_REVISION, HF_TOKEN};
 use crate::{Error, ErrorKind, Result};
 
 /// Parse iceberg properties to [`HuggingfaceConfig`].
@@ -29,17 +29,17 @@ pub(crate) fn hf_config_parse(mut m: HashMap<String, String>) -> Result<Huggingf
 
     // Default repo_type to "dataset" for Iceberg use cases
     cfg.repo_type = Some(
-        m.remove(HUGGINGFACE_REPO_TYPE)
+        m.remove(HF_REPO_TYPE)
             .unwrap_or_else(|| "dataset".to_string()),
     );
 
     // Default revision to "main"
     cfg.revision = Some(
-        m.remove(HUGGINGFACE_REVISION)
+        m.remove(HF_REVISION)
             .unwrap_or_else(|| "main".to_string()),
     );
 
-    if let Some(token) = m.remove(HUGGINGFACE_TOKEN) {
+    if let Some(token) = m.remove(HF_TOKEN) {
         cfg.token = Some(token);
     }
 
@@ -109,9 +109,9 @@ mod tests {
     #[test]
     fn test_hf_config_parse_with_props() {
         let mut props = HashMap::new();
-        props.insert(HUGGINGFACE_REPO_TYPE.to_string(), "model".to_string());
-        props.insert(HUGGINGFACE_REVISION.to_string(), "v1.0".to_string());
-        props.insert(HUGGINGFACE_TOKEN.to_string(), "hf_xxx".to_string());
+        props.insert(HF_REPO_TYPE.to_string(), "model".to_string());
+        props.insert(HF_REVISION.to_string(), "v1.0".to_string());
+        props.insert(HF_TOKEN.to_string(), "hf_xxx".to_string());
 
         let config = hf_config_parse(props).unwrap();
 

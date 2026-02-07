@@ -29,7 +29,7 @@
 //! - [`GcsConfig`]: Google Cloud Storage specific configuration
 //! - [`OssConfig`]: Alibaba Cloud OSS specific configuration
 //! - [`AzdlsConfig`]: Azure Data Lake Storage specific configuration
-//! - [`HuggingfaceStorageConfig`]: HuggingFace Hub specific configuration
+//! - [`HfStorageConfig`]: HuggingFace Hub specific configuration
 
 mod azdls;
 mod gcs;

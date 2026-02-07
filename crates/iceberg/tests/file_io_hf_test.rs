@@ -22,8 +22,8 @@
 //! `datasets/`) must NOT be included since `repo_type` defaults to `dataset`
 //! and opendal prepends it automatically in the API URL.
 //!
-//! Run with: `cargo test -p iceberg --features storage-huggingface -- --ignored hf`
-#[cfg(all(test, feature = "storage-huggingface"))]
+//! Run with: `cargo test -p iceberg --features storage-hf -- --ignored hf`
+#[cfg(all(test, feature = "storage-hf"))]
 mod tests {
     use iceberg::io::FileIOBuilder;
 
